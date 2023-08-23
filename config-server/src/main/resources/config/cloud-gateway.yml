@@ -1,0 +1,37 @@
+server:
+  port: 8060
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8050/eureka/
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+      - id: USER-MS
+        uri: lb://USER-MS
+        predicates:
+        - Path=/api/user/**
+
+      - id: CATALOG-MS
+        uri: lb://CATALOG-MS
+        predicates:
+        - Path=/api/catalog/**
+
+      - id: ORDER-MS
+        uri: lb://ORDER-MS
+        predicates:
+         - Path=/api/order/**
+
+hu:
+  webuni:
+    tokenlib:
+      keypaths:
+        public: C:/Users/Kazimour Antal/public.pem
+
+
+

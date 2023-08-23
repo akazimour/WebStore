@@ -1,0 +1,261 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: 'http://localhost:8053'
+    description: Generated server url
+paths:
+  /api/catalog/add/category:
+    post:
+      tags:
+        - catalog-controller
+      operationId: createCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriesDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesDto'
+    parameters: []
+  /api/catalog/add/product:
+    post:
+      tags:
+        - catalog-controller
+      operationId: addNewProductWithCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          required: false
+          name: categoryName
+    parameters: []
+  '/api/catalog/edit/product/{productId}':
+    parameters:
+      - schema:
+          type: integer
+          format: int64
+        name: productId
+        in: path
+        required: true
+    put:
+      summary: ''
+      operationId: modifyProduct
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+      tags:
+        - catalog-controller
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDto'
+        description: ''
+  '/api/catalog/delete/product/{productId}':
+    parameters:
+      - schema:
+          type: integer
+          format: int64
+        name: productId
+        in: path
+        required: true
+    delete:
+      summary: ''
+      operationId: deleteProduct
+      responses:
+        '200':
+          description: OK
+      tags:
+        - catalog-controller
+  /api/catalog/search:
+    get:
+      tags:
+        - catalog-controller
+      operationId: queryDslSearch
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+        - schema:
+            type: integer
+          in: query
+          name: size
+        - schema:
+            type: array
+            items:
+              type: string
+          in: query
+          name: sort
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDto'
+      summary: ''
+  '/api/catalog/product/{id}/history':
+    get:
+      tags:
+        - catalog-controller
+      operationId: getFullProductHistoryById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoryDataProductDto'
+  '/api/catalog/product/{id}/priceHistory':
+    get:
+      tags:
+        - catalog-controller
+      operationId: getProductPriceHistoryById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductPriceDto'
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+components:
+  schemas:
+    Categories:
+      type: object
+      properties:
+        categoryName:
+          type: string
+        consumerSegment:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        productPrice:
+          type: integer
+          format: int32
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Categories'
+    CategoriesDto:
+      type: object
+      properties:
+        categoryName:
+          type: string
+        consumerSegment:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDto'
+    ProductPriceDto:
+      type: object
+      properties:
+        price:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        productPrice:
+          type: integer
+          format: int32
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoriesDto'
+    HistoryDataProductDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ProductDto'
+        revisionType:
+          type: string
+          enum:
+            - ADD
+            - MOD
+            - DEL
+        revision:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+      title: ''
+      x-stoplight:
+        id: d60a44804b95a

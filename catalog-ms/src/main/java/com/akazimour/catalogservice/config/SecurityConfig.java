@@ -1,0 +1,42 @@
+package com.akazimour.catalogservice.config;
+
+
+
+import hu.webuni.tokenlib.JwtAuthFilter;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Autowired
+    JwtAuthFilter jwtAuthFilter;
+
+@Bean
+    protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        return http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.POST, "/api/catalog/**").hasAuthority("admin")
+                    .requestMatchers(HttpMethod.PUT, "/api/catalog/**").hasAuthority("admin")
+                    .requestMatchers(HttpMethod.DELETE, "/api/catalog/**").hasAuthority("admin")
+                    .anyRequest().permitAll())
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
+}
+
+}
+
+
